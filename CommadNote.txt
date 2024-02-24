@@ -1,0 +1,29 @@
+sudo -u www-data ./occ app_api:daemon:register --net host --haproxy_password some_secure_password docker_local_sock local_proxy docker-install http /var/run/docker.sock http://nextcloud.local
+
+
+docker run -e NC_HAPROXY_PASSWORD="some_secure_password" \
+-v /var/run/docker.sock:/var/run/docker.sock \
+--name nextcloud-appapi-dsp -h nextcloud-appapi-dsp \
+--restart unless-stopped --privileged -d \
+-p 2375:2375 --net master_default \
+ghcr.io/cloud-py-api/nextcloud-appapi-dsp:release 
+
+sudo -u www-data ./occ app_api:app:register simpleapi docker_socket_proxy --json-info {"info":{"id":"simpleApi","name":"simpleApi","summary":"simpleApi Example","description":"Example of the Nextcloud Talk Bot written in python","version":"1.0.0","licence":"MIT","namespace":"simpleApiExample","category":"tools","dependencies":{"nextcloud":{"min-version":"27","max-version":"29"}},"ex-app":{"docker-install":{"registry":"localhost:5000","image":"simple_api","image-tag":"latest"},"scopes":["TALK","TALK_BOT"],"system":false}}}
+
+sudo -u www-data ./occ app_api:app:register simpleapi manual_install --json-info {"info":{"id":"simpleApi","name":"simpleApi","summary":"simpleApi Example","description":"Example of the Nextcloud Talk Bot written in python","version":"1.0.0","licence":"MIT","namespace":"simpleApiExample","category":"tools","dependencies":{"nextcloud":{"min-version":"27","max-version":"29"}},"ex-app":{"docker-install":{"registry":"localhost:5000","image":"simple_api","image-tag":"latest"},"scopes":["TALK","TALK_BOT"],"system":false}}}
+
+
+
+
+// WORKING!! 
+
+docker build -t simpleapi:latest .
+
+docker run -d -p 8080:8080 --network master_default  --name simple_api simpleapi:latest
+
+//unregister:
+sudo -u www-data php occ app_api:app:unregister simpleapi --silent --force || true
+
+//register 
+sudo -u www-data ./occ app_api:app:register --json-info "{\"appid\":\"simple_api\",\"name\":\"simple_api\",\"daemon_config_name\":\"manual_install\",\"secret\":\"12345\",\"version\":\"1.0.1\",\"scopes\":[\"\"],\"port\":8080,\"system_app\":0}" --force-scopes --wait-finish simpleapi manual_install
+

@@ -1,0 +1,6 @@
+@SimpleApi_HostAddress = http://localhost:5290
+
+GET {{SimpleApi_HostAddress}}/heartbeat/
+Accept: application/json
+
+###

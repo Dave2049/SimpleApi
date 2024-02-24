@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<info>
+	<id>simpleApi</id>
+	<name>simpleApi</name>
+	<summary>simpleApi Example</summary>
+	<description>
+	<![CDATA[Example of the Nextcloud Talk Bot written in python]]>
+	</description>
+	<version>1.0.0</version>
+	<licence>MIT</licence>
+	<namespace>simpleApiExample</namespace>
+	<category>tools</category>
+	<dependencies>
+		<nextcloud min-version="27" max-version="29"/>
+	</dependencies>
+	<external-app>
+		<docker-install>
+			<registry>localhost:5000</registry>
+			<image>simple_api</image>
+			<image-tag>latest</image-tag>
+		</docker-install>
+		<scopes>
+			<value>TALK</value>
+			<value>TALK_BOT</value>
+		</scopes>
+		<system>false</system>
+	</external-app>
+</info>
