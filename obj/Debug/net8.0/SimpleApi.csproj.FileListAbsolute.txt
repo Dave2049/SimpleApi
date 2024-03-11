@@ -32,3 +32,4 @@
 /Volumes/T7/SCOME/feg/SimpleApi/obj/Debug/net8.0/SimpleApi.genruntimeconfig.cache
 /Volumes/T7/SCOME/feg/SimpleApi/obj/Debug/net8.0/ref/SimpleApi.dll
 /Volumes/T7/SCOME/feg/SimpleApi/bin/Debug/net8.0/Serilog.dll
+/Volumes/T7/SCOME/feg/SimpleApi/obj/Debug/net8.0/SimpleApi.sourcelink.json

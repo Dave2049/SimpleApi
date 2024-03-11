@@ -28,4 +28,5 @@ ENV AE_VERSION=1.0.1 \
 WORKDIR /app
 COPY --from=build-env /app/out ./
 COPY img/ /app/wwwroot/img/
+COPY assets/ /app/wwwroot/assets/
 ENTRYPOINT ["dotnet", "SimpleApi.dll"]

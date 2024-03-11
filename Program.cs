@@ -5,21 +5,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using SimpleApi.Application;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+// Optionally, instantiate Startup class and call ConfigureServices
+var startup = new Startup(builder.Configuration);
+startup.ConfigureServices(builder.Services);
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -36,49 +31,15 @@ app.Use(async (context, next) =>
     var requestPath = context.Request.Path;
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
     
-    
 
     logger.LogInformation("Request: {RequestMethod} {RequestPath} {RequestQuery}", requestMethod, requestPath, requestQuery);
     
     await next.Invoke();
 });
 
-//app.UseHttpsRedirection();
-
-app.MapGet("/heartbeat", () =>
-{
-    return new { status = "ok" };
-})
-.WithName("heartbeat")
-.WithOpenApi();
-
-app.MapPut("/enabled", async (HttpRequest request, int enabled) =>
-{
-    OcsHelper.SignCheck(request);
-     var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    if (enabled == 1)
-    {
-        // Enabled logic here
-        await OcsHelper.CallTopMenuApi(logger);
-        return new { error = "" };
-    }
-    else if (enabled == 0)
-    {
-        // Disabled logic here
-        return new { error = "" };
-    }
-    else
-    {
-        // Invalid value logic here
-        return new { error = "invalid" };
-    }
-})
-.WithName("enabled")
-.WithOpenApi();
-
-app.UseStaticFiles(); // Serves files from wwwroot by default
-
-
+// Optionally, call the Configure method on the Startup class
+startup.Configure(app, app.Environment);
 
 app.Run();
+
 

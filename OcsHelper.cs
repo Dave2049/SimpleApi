@@ -65,6 +65,10 @@ public static async Task<HttpResponseMessage> OcsCallAsync(
 
     SignRequest(requestMessage, user);
     logger.LogInformation("Request: {RequestMethod} {RequestUri} {RequestHeaders}", requestMessage.Method, requestMessage.RequestUri, requestMessage.Headers.ToString());
+    if (json_data != null)
+    {
+        logger.LogInformation("Request body: {RequestBody}", await requestMessage.Content.ReadAsStringAsync());
+    }
     return await client.SendAsync(requestMessage);
 }
 
@@ -72,13 +76,79 @@ public static async Task CallTopMenuApi(ILogger logger)
 {
     var jsonData = new
     {
-        name = "unique_name_of_top_menu",
+        name = "first_menu",
         displayName = "HausKreisFinder",
         icon = "img/houseIcon.svg",
         adminRequired = "0",
     };
     
     var response = await OcsCallAsync(HttpMethod.Post, logger, "/ocs/v1.php/apps/app_api/api/v1/ui/top-menu", jsonData);
+
+    if (response.IsSuccessStatusCode)
+    {
+        var responseBody = await response.Content.ReadAsStringAsync();
+        logger.LogInformation("Success: " + responseBody);
+    }
+    else
+    {
+         logger.LogInformation("error: " + response.StatusCode);  
+    }
+}
+public static async Task SetState(ILogger logger, string username)
+{
+    var jsonData = new
+    {
+        type = "top_menu",
+        name = "first_menu",
+        key = "ui_example_state",
+        value =  new [] { "username", username}
+    };
+    
+    var response = await OcsCallAsync(HttpMethod.Post, logger, "/ocs/v1.php/apps/app_api/api/v1/ui/initial-state", jsonData);
+
+    if (response.IsSuccessStatusCode)
+    {
+        var responseBody = await response.Content.ReadAsStringAsync();
+        logger.LogInformation("Success: " + responseBody);
+    }
+    else
+    {
+         logger.LogInformation("error: " + response.StatusCode);  
+    }
+}
+
+public static async Task RegisterFrontendJS(ILogger logger)
+{
+    var jsonData = new
+    {
+        type= "top_menu",
+        name= "first_menu",
+        path= "assets/index"
+    };
+
+    var response = await OcsCallAsync(HttpMethod.Post, logger, "/ocs/v1.php/apps/app_api/api/v1/ui/script", jsonData);
+
+    if (response.IsSuccessStatusCode)
+    {
+        var responseBody = await response.Content.ReadAsStringAsync();
+        logger.LogInformation("Success: " + responseBody);
+    }
+    else
+    {
+         logger.LogInformation("error: " + response.StatusCode);  
+    }
+}
+
+public static async Task RegisterFrontendCSS(ILogger logger)
+{
+    var jsonData = new
+    {
+        type= "top_menu",
+        name= "first_menu",
+        path= "assets/index"
+    };
+
+    var response = await OcsCallAsync(HttpMethod.Post, logger, "/ocs/v1.php/apps/app_api/api/v1/ui/style", jsonData);
 
     if (response.IsSuccessStatusCode)
     {
@@ -111,12 +181,4 @@ public static string GetNcUrl(ILogger logger)
     return ncUrl;
 }
 
-}
-
-public class TopMenuRequest
-{
-    public string Name { get; set; } = "unique_name_of_top_menu";
-    public string DisplayName { get; set; } = "Display name";
-    public string Icon { get; set; } = "img/icon.svg";
-    public string AdminRequired { get; set; } = "0";
 }
