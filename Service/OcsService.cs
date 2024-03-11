@@ -4,9 +4,11 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-public class OcsHelper
+namespace SimpleApi.Service;
+
+public class OcsService(ILogger logger)
 {
-    public static void SignRequest(HttpRequestMessage requestMessage, string user = "")
+    public void SignRequest(HttpRequestMessage requestMessage, string user = "")
     {
         var appSecret = Environment.GetEnvironmentVariable("APP_SECRET");
         var appId = Environment.GetEnvironmentVariable("APP_ID");
@@ -19,38 +21,8 @@ public class OcsHelper
         requestMessage.Headers.Add("OCS-APIRequest", "true");
     }
 
-    public static string SignCheck(HttpRequest request)
-{
-    var aaVersion = request.Headers["AA-VERSION"];
-    var exAppId = request.Headers["EX-APP-ID"];
-    var exAppVersion = request.Headers["EX-APP-VERSION"];
-    var authorizationAppApi = request.Headers["AUTHORIZATION-APP-API"];
-
-    var expectedAppId = Environment.GetEnvironmentVariable("APP_ID");
-    var expectedAppVersion = Environment.GetEnvironmentVariable("APP_VERSION");
-
-    if (exAppId != expectedAppId)
-    {
-        throw new ArgumentException($"Invalid EX-APP-ID: {exAppId} != {expectedAppId}");
-    }
-
-    if (exAppVersion != expectedAppVersion)
-    {
-        throw new ArgumentException($"Invalid EX-APP-VERSION: {exAppVersion} != {expectedAppVersion}");
-    }
-
-    var decodedAuth = Encoding.UTF8.GetString(Convert.FromBase64String(authorizationAppApi));
-    var parts = decodedAuth.Split(':');
-    if (parts.Length != 2 || parts[1] != Environment.GetEnvironmentVariable("APP_SECRET"))
-    {
-        throw new ArgumentException("Invalid APP_SECRET");
-    }
-
-    return parts[0]; // Username
-}
-
-public static async Task<HttpResponseMessage> OcsCallAsync(
-    HttpMethod method, ILogger logger,
+public async Task<HttpResponseMessage> OcsCallAsync(
+    HttpMethod method,
     string path,
     object json_data = null,
     string user = "")
@@ -72,7 +44,7 @@ public static async Task<HttpResponseMessage> OcsCallAsync(
     return await client.SendAsync(requestMessage);
 }
 
-public static async Task CallTopMenuApi(ILogger logger)
+public async Task CallTopMenuApi()
 {
     var jsonData = new
     {
@@ -82,7 +54,7 @@ public static async Task CallTopMenuApi(ILogger logger)
         adminRequired = "0",
     };
     
-    var response = await OcsCallAsync(HttpMethod.Post, logger, "/ocs/v1.php/apps/app_api/api/v1/ui/top-menu", jsonData);
+    var response = await OcsCallAsync(HttpMethod.Post, "/ocs/v1.php/apps/app_api/api/v1/ui/top-menu", jsonData);
 
     if (response.IsSuccessStatusCode)
     {
@@ -94,17 +66,17 @@ public static async Task CallTopMenuApi(ILogger logger)
          logger.LogInformation("error: " + response.StatusCode);  
     }
 }
-public static async Task SetState(ILogger logger, string username)
+public async Task SetState()
 {
     var jsonData = new
     {
         type = "top_menu",
         name = "first_menu",
         key = "ui_example_state",
-        value =  new [] { "username", username}
+        value =  new [] { "init state", "no state"}
     };
     
-    var response = await OcsCallAsync(HttpMethod.Post, logger, "/ocs/v1.php/apps/app_api/api/v1/ui/initial-state", jsonData);
+    var response = await OcsCallAsync(HttpMethod.Post, "/ocs/v1.php/apps/app_api/api/v1/ui/initial-state", jsonData);
 
     if (response.IsSuccessStatusCode)
     {
@@ -117,7 +89,7 @@ public static async Task SetState(ILogger logger, string username)
     }
 }
 
-public static async Task RegisterFrontendJS(ILogger logger)
+public async Task RegisterFrontendJS()
 {
     var jsonData = new
     {
@@ -126,7 +98,7 @@ public static async Task RegisterFrontendJS(ILogger logger)
         path= "assets/index"
     };
 
-    var response = await OcsCallAsync(HttpMethod.Post, logger, "/ocs/v1.php/apps/app_api/api/v1/ui/script", jsonData);
+    var response = await OcsCallAsync(HttpMethod.Post, "/ocs/v1.php/apps/app_api/api/v1/ui/script", jsonData);
 
     if (response.IsSuccessStatusCode)
     {
@@ -139,7 +111,7 @@ public static async Task RegisterFrontendJS(ILogger logger)
     }
 }
 
-public static async Task RegisterFrontendCSS(ILogger logger)
+public async Task RegisterFrontendCSS()
 {
     var jsonData = new
     {
@@ -148,7 +120,7 @@ public static async Task RegisterFrontendCSS(ILogger logger)
         path= "assets/index"
     };
 
-    var response = await OcsCallAsync(HttpMethod.Post, logger, "/ocs/v1.php/apps/app_api/api/v1/ui/style", jsonData);
+    var response = await OcsCallAsync(HttpMethod.Post, "/ocs/v1.php/apps/app_api/api/v1/ui/style", jsonData);
 
     if (response.IsSuccessStatusCode)
     {

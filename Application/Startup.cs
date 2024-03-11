@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using SimpleApi.Service;
 
 namespace SimpleApi.Application
 {
@@ -26,6 +28,8 @@ namespace SimpleApi.Application
             // For API projects, you might only need controllers, so use AddControllers() instead
             services.AddControllers();
             services.AddSingleton<IAuthorizationHandler, SignCheckHandler>();
+            services.AddSingleton<OcsService>();
+            services.AddDbContext<ElvantoSync.Persistence.DbContext>(options => options.UseSqlite("Data Source=GroupFinder.db"));
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("SignCheckPolicy", policy =>
