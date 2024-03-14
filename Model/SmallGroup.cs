@@ -1,11 +1,6 @@
 namespace SimpleApi.Models{
 
-public record SmallGroupDTO{
-    int id;
-    String geoCode;
-    Adress adress;
-    int maxCapacity;
-};
+
 
 public record SmallGroupRequest{
     int id;
