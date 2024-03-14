@@ -13,8 +13,7 @@ builder.Logging.AddConsole();
 // Optionally, instantiate Startup class and call ConfigureServices
 var startup = new Startup(builder.Configuration);
 startup.ConfigureServices(builder.Services);
-
-var app = builder.Build();
+var app = builder.Build();   
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -36,7 +35,6 @@ app.Use(async (context, next) =>
     
     await next.Invoke();
 });
-
 // Optionally, call the Configure method on the Startup class
 startup.Configure(app, app.Environment);
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SimpleApi.Service;
 
-public class OcsService(ILogger logger)
+public class OcsService(ILogger<OcsService> logger)
 {
     public void SignRequest(HttpRequestMessage requestMessage, string user = "")
     {

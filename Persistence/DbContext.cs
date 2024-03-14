@@ -2,7 +2,7 @@
 using SimpleApi.Persistence.Entities;
 
 
-namespace ElvantoSync.Persistence;
+namespace SimpleApi.Persistence;
 
 public class DbContext : Microsoft.EntityFrameworkCore.DbContext
 {

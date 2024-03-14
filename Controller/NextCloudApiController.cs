@@ -22,9 +22,7 @@ namespace SimpleApi.Controllers
         [Authorize(Policy = "SignCheckPolicy")]
         public async Task<IActionResult> SetEnabled([FromQuery] int enabled)
         {
-
-
-             var username = User.Identity?.Name; 
+            var username = User.Identity?.Name; 
             _logger.LogInformation("User {username} is trying to enable the app", username);
             // Your existing logic for handling the enabled state
             // OcsHelper and other utility classes should be accessible here
